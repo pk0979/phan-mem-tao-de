@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Printer, Download, FileSpreadsheet, FileText, BookOpen, FileQuestion, CheckSquare, Sparkles, Loader2, Award } from 'lucide-react';
 
-const SUBJECTS = [
-  'KHTN 8 - PHÂN MÔN HOÁ HỌC', 'KHOA HỌC TỰ NHIÊN 8', 'Toán học', 'Ngữ văn', 'Tiếng Anh', 'Vật lí', 'Hóa học', 'Sinh học', 
-  'Lịch sử', 'Địa lí', 'Giáo dục công dân', 'Tin học', 'Công nghệ', 'Khác...'
-];
-
 export default function App() {
   const [departmentName, setDepartmentName] = useState('UBND XÃ VĨNH HẬU');
   const [schoolName, setSchoolName] = useState('TRƯỜNG THCS ĐA PHƯỚC');
   const [examName, setExamName] = useState('ĐỀ KIỂM TRA GIỮA HỌC KÌ I');
-  const [schoolYear, setSchoolYear] = useState('2025-2026');
+  const [schoolYear, setSchoolYear] = useState('2026-2027');
   const [subject, setSubject] = useState('KHTN 8 - PHÂN MÔN HOÁ HỌC');
-  const [timeTime, setTimeTime] = useState('25 phút');
-  const [examDate, setExamDate] = useState('14/11/2025');
+  const [bookSeries, setBookSeries] = useState('Kết nối tri thức với cuộc sống');
+  const [timeTime, setTimeTime] = useState('45 phút');
+  const [examDate, setExamDate] = useState('14/11/2026');
   const [testCode, setTestCode] = useState('01');
   
   // Trọng số điểm
@@ -176,8 +172,9 @@ b.
       }));
 
       const prompt = `Bạn là một giáo viên xuất sắc đang công tác tại ${schoolName}.
-      Dựa vào MA TRẬN ĐỀ THI môn ${subject} dưới đây, hãy biên soạn:
-      1. Yêu cầu cần đạt (Đặc tả): Viết ngắn gọn yêu cầu cần đạt.
+      Dựa vào MA TRẬN ĐỀ THI môn ${subject} (sử dụng chuẩn kiến thức của bộ sách: ${bookSeries}) dưới đây, hãy biên soạn:
+      
+      1. Yêu cầu cần đạt (Đặc tả): Viết ngắn gọn yêu cầu cần đạt (Bám sát thuật ngữ sách ${bookSeries}).
       2. ĐỀ KIỂM TRA: Soạn đề thi tuân thủ CẤU TRÚC SAU (dùng in đậm **PHẦN...** cho các tiêu đề):
          **PHẦN I. TRẮC NGHIỆM KHÁCH QUAN** **1. Câu trắc nghiệm nhiều lựa chọn.** Thí sinh trả lời từ câu 1 đến câu [Số câu]. Mỗi câu hỏi thí sinh chỉ chọn 1 phương án.
          (Soạn các câu hỏi, kèm 4 đáp án A, B, C, D).
@@ -268,10 +265,8 @@ b.
     }
   };
 
-  // Tính số lượng câu để hiển thị form Bài làm
   const totalTNDSCount = Math.ceil(totalTNDS); 
 
-  // Header thi HTML
   const examHeaderHTML = `
     <table class="header-table" style="margin-bottom: 5px;">
       <tbody>
@@ -308,7 +303,6 @@ b.
     </table>
   `;
 
-  // HTML cho khung "BÀI LÀM" sử dụng table border-bottom để hiển thị đường kẻ ngang hoàn hảo trong Word
   let baiLamHTML = `
     <div style="text-align: center; font-weight: bold; margin-top: 30px;">----- HẾT -----</div>
     <div style="margin-top: 10px; font-size: 11pt;">
@@ -654,7 +648,7 @@ b.
 
       <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 flex-grow w-full">
         
-        {/* Toolbar Cập nhật thêm bản quyền tác giả */}
+        {/* Toolbar */}
         <div className="bg-indigo-700 text-white p-4 flex flex-col md:flex-row justify-between items-center no-print">
           <div className="flex flex-col items-center md:items-start mb-4 md:mb-0">
             <div className="flex items-center space-x-2">
@@ -708,7 +702,7 @@ b.
           {/* === TAB 1: MA TRẬN === */}
           <div className={`tab-content ${activeTab === 'matran' ? 'block' : 'hidden print:block'}`}>
             
-            {/* Header Thông tin chung */}
+            {/* Header Thông tin chung (Vẫn có thể click sửa trực tiếp) */}
             <div className="flex flex-col md:flex-row justify-between mb-8 print-header">
               <div className="text-center md:text-left mb-4 md:mb-0">
                 <input 
@@ -752,52 +746,78 @@ b.
               </div>
             </div>
 
-            <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200 no-print">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Môn học</label>
-                <select 
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                >
-                  {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
+            {/* BẢNG ĐIỀN THÔNG TIN TỔNG HỢP CẢI TIẾN */}
+            <div className="no-print space-y-4 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Cơ quan chủ quản</label>
+                  <input type="text" className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500" value={departmentName} onChange={(e) => setDepartmentName(e.target.value)} placeholder="Phòng GD/UBND" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tên trường</label>
+                  <input type="text" className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500" value={schoolName} onChange={(e) => setSchoolName(e.target.value)} placeholder="Tên trường học" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tên kỳ thi</label>
+                  <input type="text" className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500" value={examName} onChange={(e) => setExamName(e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Năm học</label>
+                  <input type="text" className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500" value={schoolYear} onChange={(e) => setSchoolYear(e.target.value)} />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian làm bài</label>
-                <input 
-                  type="text" 
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                  value={timeTime}
-                  onChange={(e) => setTimeTime(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ngày thi</label>
-                <input 
-                  type="text" 
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                  value={examDate}
-                  onChange={(e) => setExamDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Điểm / Câu TN</label>
-                <input 
-                  type="number" step="0.1"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                  value={scorePerTN}
-                  onChange={(e) => setScorePerTN(parseFloat(e.target.value))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Điểm / Câu Đ/S (4 ý)</label>
-                <input 
-                  type="number" step="0.1"
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                  value={scorePerTNDS}
-                  onChange={(e) => setScorePerTNDS(parseFloat(e.target.value))}
-                />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Môn học / Phân môn</label>
+                  <input 
+                    type="text"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="Nhập tự do (VD: KHTN 8 - Hóa học)"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Bộ sách</label>
+                  <select 
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                    value={bookSeries}
+                    onChange={(e) => setBookSeries(e.target.value)}
+                  >
+                    <option value="Kết nối tri thức với cuộc sống">Kết nối tri thức</option>
+                    <option value="Chân trời sáng tạo">Chân trời sáng tạo</option>
+                    <option value="Cánh diều">Cánh diều</option>
+                    <option value="Dùng chung">Khác (Dùng chung)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian</label>
+                  <input 
+                    type="text" 
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                    value={timeTime}
+                    onChange={(e) => setTimeTime(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Điểm/Câu TN</label>
+                  <input 
+                    type="number" step="0.1"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                    value={scorePerTN}
+                    onChange={(e) => setScorePerTN(parseFloat(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Điểm/Câu ĐS</label>
+                  <input 
+                    type="number" step="0.1"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                    value={scorePerTNDS}
+                    onChange={(e) => setScorePerTNDS(parseFloat(e.target.value))}
+                  />
+                </div>
               </div>
             </div>
 
