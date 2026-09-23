@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Trash2, Printer, Download, FileSpreadsheet, FileText, BookOpen, FileQuestion, CheckSquare, Sparkles, Loader2, Award } from 'lucide-react';
 
 export default function App() {
-  const [departmentName, setDepartmentName] = useState('UBND XÃ VĨNH HẬU');
+  const [departmentName, setDepartmentName] = useState('PHÒNG GDĐT AN PHÚ');
   const [schoolName, setSchoolName] = useState('TRƯỜNG THCS ĐA PHƯỚC');
   const [examName, setExamName] = useState('ĐỀ KIỂM TRA GIỮA HỌC KÌ I');
   const [schoolYear, setSchoolYear] = useState('2026-2027');
@@ -160,7 +160,15 @@ b.
 
     try {
       const apiKey = import.meta.env?.VITE_GEMINI_API_KEY || ""; 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      
+      if (!apiKey) {
+        alert("LỖI: Trang web chưa nhận được API Key! Anh hãy chắc chắn đã cấu hình VITE_GEMINI_API_KEY trên Vercel nhé.");
+        setIsGenerating(false);
+        return;
+      }
+
+      // Đổi sang phiên bản ổn định 1.5-flash
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
       const matrixData = rows.map(r => ({
         id: r.id,
@@ -231,7 +239,7 @@ b.
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error("API call failed");
+      if (!response.ok) throw new Error(`HTTP Error ${response.status} - Cần kiểm tra lại API Key`);
 
       const data = await response.json();
       const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -259,7 +267,7 @@ b.
 
     } catch (error) {
       console.error("Lỗi khi gọi AI:", error);
-      alert("Có lỗi xảy ra khi tạo đề tự động. Vui lòng kiểm tra lại kết nối hoặc thử lại sau.");
+      alert("LỖI KẾT NỐI AI: " + error.message + "\n(Anh F5 lại trang hoặc kiểm tra đã cấu hình đúng API Key trên Vercel chưa nhé).");
     } finally {
       setIsGenerating(false);
     }
@@ -285,7 +293,7 @@ b.
         </tr>
       </tbody>
     </table>
-    <div style="margin-bottom: 10px; font-weight: bold; font-size: 12pt;">Lớp: 8A..............</div>
+    <div style="margin-bottom: 10px; font-weight: bold; font-size: 12pt;">Lớp: .....................</div>
     
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;" border="1">
       <tbody>
@@ -1082,12 +1090,12 @@ b.
               </div>
               <div className="text-center w-7/12">
                 <div className="font-bold text-lg">{examName}</div>
-                <div className="font-bold text-sm">NĂM HỌC: ${schoolYear}</div>
+                <div className="font-bold text-sm">NĂM HỌC: {schoolYear}</div>
                 <div className="font-bold text-sm">Môn: {subject.toUpperCase()}</div>
                 <div className="italic text-sm">(Thời gian làm bài: {timeTime}) Ngày: {examDate}</div>
               </div>
             </div>
-            <div className="hidden print:block font-bold mb-4">Lớp: 8A..............</div>
+            <div className="hidden print:block font-bold mb-4">Lớp: .....................</div>
             
             {/* Bảng điểm in */}
             <table className="hidden print:table w-full border-collapse mb-6" border="1">
